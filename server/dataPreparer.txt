@@ -1,0 +1,119 @@
+<?php
+
+require_once __DIR__ . '/./vendor/autoload.php';
+
+$jsonString = file_get_contents(__DIR__ . '/./Scandiweb.json');
+
+if (!$jsonString) die("Error reading JSON file");
+
+$data = json_decode($jsonString, true);
+extract($data["data"]);
+
+
+function queryDb($query, $pdo)
+{
+    $statement = $pdo->prepare($query);
+    $statement = $statement->execute();
+}
+
+function prepProducts($products)
+{
+    $products = array_map(function ($product) {
+        $product["gallery"] = json_encode($product["gallery"]);
+        $product["prices"] = json_encode($product["prices"]);
+        return $product;
+    }, $products);
+
+    return $products;
+}
+
+function prepAttr($products)
+{
+    $attributes = array_map(function ($product) {
+        $modProd["product_id"] = $product["id"];
+        $modProd["attributes"] = json_encode($product["attributes"]);
+        return $modProd;
+    }, $products);
+
+    return $attributes;
+}
+
+function inserter($items, $resolver)
+{
+    // var_dump($items);
+    // die();
+    foreach ($items as $item) {
+        $resolver($item);
+    }
+}
+
+function insertCateg($category)
+{
+    $query = "insert into categories (name) values (:name);";
+    query($query, [':name' => $category["name"]]);
+}
+
+function insertProduct($product)
+{
+    $query = "insert into products (id, inStock, description, category, brand, gallery, prices, name) values (:id, :inStock, :description, :category, :brand, :gallery, :prices, :name)";
+    $inStock = $product["inStock"] ? 1 : 0;
+
+    query($query, [":id" => $product["id"], ":inStock" => $inStock, ":description" => $product["description"], ":category" => $product["category"], ":brand" => $product["brand"], ":gallery" => $product["gallery"], ":prices" => $product["prices"], "name" => $product["name"]]);
+}
+
+function insertGallery($link)
+{
+    $query = "insert into galleries (product_id, url) values (:product_id, :url)";
+
+    query($query, [":product_id" => $link["product_id"], ":url" => $link["url"]]);
+}
+
+function insertAttribute($attr)
+{
+    $query = "insert into attributes (product_id, attributes) values (:product_id, :attributes)";
+
+    query($query, ["product_id" => $attr["product_id"], "attributes" => $attr["attributes"]]);
+}
+
+function query($query, $params)
+{
+    $uri = "mysql://avnadmin:AVNS_BQcg5if0JKPfQ1aNK8W@scandibuy-scandibuy-fin.g.aivencloud.com:17163/defaultdb?ssl-mode=REQUIRED";
+
+    $fields = parse_url($uri);
+
+    // var_dump($fields);
+    // die();
+
+    // build the DSN including SSL settings
+    $conn = "mysql:";
+    $conn .= "host=" . $fields["host"];
+    $conn .= ";port=" . $fields["port"];;
+    $conn .= ";dbname=defaultdb";
+    $conn .= ";sslmode=verify-ca;sslrootcert=ca.pem";
+
+    // $dsn = "mysql:hostname=sql.freedb.tech;port=3306;dbname=freedb_scandibuy;charset=utf8mb4";
+    $pdo = new PDO($conn, $fields["user"], $fields["pass"], [PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]);
+
+    try {
+        echo "Loading\n";
+        // var_dump($query, $params);
+        // die();
+        $pdo->prepare($query)->execute($params);
+        echo "Done\n";
+    } catch (Throwable $e) {
+        var_dump($e->getMessage());
+        die();
+    }
+}
+
+
+
+// $modProducts = prepProducts($products);
+// $attributes = prepAttr($products);
+
+
+
+
+// inserter($categories, 'insertCateg');
+// inserter($modProducts, 'insertProduct');
+// inserter($attributes, 'insertAttribute');
