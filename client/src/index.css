@@ -16,3 +16,7 @@
     @apply text-green-600 border-green-600;
   }
 }
+
+.skeleton_loader {
+  @apply animate-pulse bg-slate-200;
+}
