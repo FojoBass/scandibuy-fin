@@ -48,3 +48,10 @@ img {
 .gallery_wrapper::-webkit-scrollbar-corner {
   background: transparent;
 }
+
+.desc_wrapper {
+  @apply flex flex-col gap-3;
+  ul {
+    @apply flex flex-col gap-3;
+  }
+}

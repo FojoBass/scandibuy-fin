@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import useFetch from '../hooks/useFetch';
-import { Attribute, Product, ProductResponse } from '../types';
+import { Attribute, Product, ProductResponse, SelAttribute } from '../types';
 import { GetProduct } from '../services/queries';
 import { FaAngleRight, FaHome } from 'react-icons/fa';
 import SkeletonLoader from '../components/SkeletonLoader';
 import { FaAngleLeft } from 'react-icons/fa6';
+import parse from 'html-react-parser';
 
 const SingleProduct = () => {
   const { id } = useParams();
@@ -18,6 +19,38 @@ const SingleProduct = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [attributes, setAttributes] = useState<Attribute[]>([]);
   const sliderRef = useRef<HTMLDivElement>(null);
+  const [selectedAttributes, setSelectedAttributes] = useState<SelAttribute[]>(
+    []
+  );
+  const [isDisableCartBtn, setIsDisableCartBtn] = useState(false);
+
+  console.log('ATTRIBUTES: ', attributes);
+  console.log('SEL ATTRIBUTES: ', selectedAttributes);
+
+  const handleSelAttribute = (id: string, value: string) => {
+    const targetAttr = attributes.find((attr) => attr.id === id);
+    const selItem = targetAttr?.items.find((item) => item.value === value);
+
+    if (targetAttr && selItem) {
+      // ? If attribute has a selected option
+      if (selectedAttributes.some(({ id: selId }) => selId === id))
+        setSelectedAttributes((prev) => [
+          ...prev.map((selAttr) =>
+            selAttr.id === id
+              ? {
+                  ...selAttr,
+                  selItem,
+                }
+              : selAttr
+          ),
+        ]);
+      else
+        setSelectedAttributes((prev) => [
+          ...prev,
+          { id: targetAttr.id, selItem },
+        ]);
+    }
+  };
 
   useEffect(() => {
     if (id) {
@@ -44,7 +77,9 @@ const SingleProduct = () => {
     setAttributes(product?.attributes ?? []);
   }, [product]);
 
-  console.log({ attributes });
+  useEffect(() => {
+    setIsDisableCartBtn(selectedAttributes.length !== attributes.length);
+  }, [attributes, selectedAttributes]);
 
   return (
     <section className='mt-5 px-4 pb-20'>
@@ -56,7 +91,7 @@ const SingleProduct = () => {
           <FaHome size={20} />
         </Link>
 
-        <div className='flex gap-20'>
+        <div className='flex gap-20 items-start '>
           {isLoading ? (
             <>
               <div className='w-[60%] flex gap-5'>
@@ -68,7 +103,7 @@ const SingleProduct = () => {
             </>
           ) : product ? (
             <>
-              <div className='w-[70%] flex gap-5 items-start '>
+              <div className='w-[70%] flex gap-5 items-start sticky top-5'>
                 <aside className='w-[10%] flex flex-col gap-4'>
                   {product.gallery.map((url, index) => (
                     <button
@@ -123,7 +158,7 @@ const SingleProduct = () => {
                     className='flex absolute duration-300'
                     style={{ left: `${-currentIndex * 100}%` }}
                   >
-                    {product.gallery.map((url) => (
+                    {product.gallery.map((url, index) => (
                       <div key={url} className='w-[800px]  flex justify-center'>
                         <img
                           src={url}
@@ -133,6 +168,9 @@ const SingleProduct = () => {
                             height: 'auto',
                             maxHeight: '600px',
                           }}
+                          className={`${
+                            currentIndex === index ? 'opacity-100' : 'opacity-0'
+                          } duration-200`}
                         />
                       </div>
                     ))}
@@ -147,28 +185,71 @@ const SingleProduct = () => {
 
                 <div>
                   {attributes.map(({ id, items }) => (
-                    <div key={id}>
-                      <b>{id}</b>
-                      <div className='flex gap-2 mb-3'>
-                        {items.map(({ displayValue, value }) =>
-                          id.toLowerCase() === 'color' ? (
+                    <div key={id} className='mb-5'>
+                      <b className='uppercase text-sm'>{id}:</b>
+                      <div className='flex gap-2'>
+                        {items.map(({ displayValue, value }) => {
+                          const isSelected = selectedAttributes.some(
+                            ({ id: selId, selItem }) =>
+                              selId === id && selItem.value === value
+                          );
+
+                          return id.toLowerCase() === 'color' ? (
                             <button
                               key={displayValue}
-                              className='w-7 cursor-pointer aspect-square p-1'
-                              style={{ backgroundColor: value }}
+                              className={`w-7 border-2 p-[2px] duration-200 cursor-pointer aspect-square  ${
+                                isSelected
+                                  ? 'border-green-500'
+                                  : 'border-transparent'
+                              }`}
+                              style={{
+                                backgroundColor: value,
+                                backgroundClip: 'content-box',
+                              }}
+                              onClick={() => handleSelAttribute(id, value)}
+                              disabled={isSelected}
                             />
                           ) : (
                             <button
                               key={displayValue}
-                              className='border border-black py-1  text-center w-[50px] text-sm cursor-pointer'
+                              className={`border border-black py-1  text-center w-[50px] text-sm cursor-pointer ${
+                                isSelected ? 'bg-black text-white' : ''
+                              }`}
+                              onClick={() => handleSelAttribute(id, value)}
+                              disabled={isSelected}
                             >
                               {value}
                             </button>
-                          )
-                        )}
+                          );
+                        })}
                       </div>
                     </div>
                   ))}
+
+                  <div>
+                    <b className='uppercase text-sm block w-fit'>Price:</b>
+                    <b className='text-lg'>
+                      {product.prices[0].currency.symbol}
+                      {product.prices[0].amount}
+                    </b>
+                  </div>
+                </div>
+
+                {Boolean(product.inStock) && (
+                  <button
+                    className={`mt-6 block bg-green-600  duration-300 w-full text-white py-3  ${
+                      isDisableCartBtn
+                        ? 'cursor-not-allowed opacity-50 grayscale-100'
+                        : 'cursor-pointer hover:bg-green-500'
+                    }`}
+                    disabled={isDisableCartBtn}
+                  >
+                    ADD TO CART
+                  </button>
+                )}
+
+                <div className='mt-6 text-sm desc_wrapper'>
+                  {parse(product.description)}
                 </div>
               </aside>
             </>

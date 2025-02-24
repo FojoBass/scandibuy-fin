@@ -36,3 +36,12 @@ export interface Attribute {
   name: string;
   type: string;
 }
+
+export interface SelAttribute {
+  id: string;
+  selItem: {
+    displayValue: string;
+    id: string;
+    value: string;
+  };
+}
