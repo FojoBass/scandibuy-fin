@@ -1,6 +1,6 @@
 import { AiOutlineShoppingCart } from 'react-icons/ai';
 import { RiShoppingBag2Fill } from 'react-icons/ri';
-import { useSearchParams } from 'react-router';
+import { useLocation, useNavigate, useSearchParams } from 'react-router';
 import useGlobalContext from '../hooks/useGlobalContext';
 import { useEffect, useState } from 'react';
 import { AllCategories } from '../services/queries';
@@ -14,11 +14,13 @@ const Navbar = () => {
   const { isLoading, response, fetchData } = useFetch<{ categories: string[] }>(
     { initialLoading: true }
   );
-  const [options, setOptions] = useState<string[]>(['']);
+  const [options, setOptions] = useState<string[]>([]);
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
 
   const handleCategoryClick = (categ: string) => {
-    if (categ) setSearchParams({ c: categ });
-    else setSearchParams({});
+    if (pathname !== '/') navigate(`/?c${categ}`);
+    setSearchParams({ c: categ });
   };
 
   useEffect(() => {
@@ -31,10 +33,15 @@ const Navbar = () => {
 
   useEffect(() => {
     if (response) {
-      const modOptions = ['', ...response.categories];
-      setOptions([...new Set(modOptions)]);
+      setOptions(response.categories);
+      setSearchParams({ c: response.categories[0] });
     }
   }, [response]);
+
+  useEffect(() => {
+    if (pathname === '/' && options.length && !categValue)
+      setSearchParams({ c: options[0] });
+  }, [pathname, options, categValue]);
 
   return (
     <nav className='px-4 py-2'>
@@ -46,12 +53,15 @@ const Navbar = () => {
             options.map((option) => (
               <button
                 key={option}
-                className={`nav_btn ${
-                  (categValue ?? '') === option ? 'active' : ''
-                }`}
+                className={`nav_btn ${categValue === option ? 'active' : ''}`}
                 onClick={() => handleCategoryClick(option)}
+                data-testid={
+                  categValue === option
+                    ? 'active-category-link'
+                    : 'category-link'
+                }
               >
-                {option || 'all'}
+                {option}
               </button>
             ))
           )}
@@ -59,12 +69,12 @@ const Navbar = () => {
 
         <RiShoppingBag2Fill size={25} className='text-green-500' />
 
-        <div className='relative'>
+        <button className='relative cursor-pointer'>
           <AiOutlineShoppingCart size={25} />
           <span className='absolute top-0 right-0 translate-x-[25%] translate-y-[-30%] flex items-center justify-center bg-black text-white rounded-full text-xs px-1'>
             5
           </span>
-        </div>
+        </button>
       </div>
     </nav>
   );

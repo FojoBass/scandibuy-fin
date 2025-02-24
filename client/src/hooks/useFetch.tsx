@@ -21,7 +21,7 @@ const useFetch = <R, T = undefined>({ initialLoading }: FetchProps) => {
     } catch (err) {
       console.error('Error in fetchData:', err);
     } finally {
-      setIsLoading(false);
+      if (!signal?.aborted) setIsLoading(false);
     }
   };
 

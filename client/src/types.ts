@@ -23,6 +23,7 @@ export interface Product {
   gallery: string[];
   prices: { amount: number; currency: { label: string; symbol: string } }[];
   attributes: Attribute[];
+  description: string;
 }
 
 export interface Attribute {

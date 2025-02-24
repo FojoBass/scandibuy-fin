@@ -3,6 +3,7 @@
 
 * {
   font-family: 'Raleway', sans-serif;
+  box-sizing: border-box;
 }
 
 .center_sect {
@@ -19,4 +20,31 @@
 
 .skeleton_loader {
   @apply animate-pulse bg-slate-200;
+}
+
+img {
+  @apply w-[100%] h-[100%] object-cover;
+}
+
+.gallery_wrapper::-webkit-scrollbar {
+  width: 3px;
+  height: 3px;
+}
+
+.gallery_wrapper::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 4px;
+}
+
+.gallery_wrapper::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.gallery_wrapper::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 4px;
+}
+
+.gallery_wrapper::-webkit-scrollbar-corner {
+  background: transparent;
 }
