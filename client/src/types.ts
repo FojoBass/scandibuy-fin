@@ -7,6 +7,18 @@ export interface Context {
   setCart?: Dispatch<SetStateAction<CartItem[]>>;
   isCartOpened?: boolean;
   setIsCartOpened?: Dispatch<SetStateAction<boolean>>;
+  toast?: {
+    type: 'neutral' | 'danger' | 'success';
+    message: string;
+    state: boolean;
+  };
+  setToast?: Dispatch<
+    SetStateAction<{
+      type: 'neutral' | 'danger' | 'success';
+      message: string;
+      state: boolean;
+    }>
+  >;
 }
 
 export interface ProductResponse {

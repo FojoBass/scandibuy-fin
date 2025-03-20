@@ -17,7 +17,7 @@ interface Order {
 
 const Navbar = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { setCategory } = useGlobalContext();
+  const { setCategory, setToast } = useGlobalContext();
   const categValue = searchParams.get('c');
   const { isLoading, response, fetchReq } = useFetch<{ categories: string[] }>({
     initialLoading: true,
@@ -50,10 +50,23 @@ const Navbar = () => {
         qty,
       })) ?? [];
 
-    orderReq(CreateOrder, { orders }, null, () => {
-      setCart?.([]);
-      setIsCartOpened?.(false);
-    });
+    orderReq(
+      CreateOrder,
+      { orders },
+      null,
+      () => {
+        setCart?.([]);
+        setIsCartOpened?.(false);
+        setToast?.({
+          type: 'success',
+          message: 'Order Placed Successfully',
+          state: true,
+        });
+      },
+      () => {
+        setToast?.({ type: 'danger', message: 'Order Failed', state: true });
+      }
+    );
   };
 
   useEffect(() => {

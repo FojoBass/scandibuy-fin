@@ -9,8 +9,7 @@ import Products from './pages/Products';
 import SingleProduct from './pages/SingleProduct';
 import NotFound from './pages/NotFound';
 import Navbar from './components/Navbar';
-
-
+import Toast from './components/Toast';
 
 const App = () => {
   const router = createBrowserRouter(
@@ -28,6 +27,7 @@ const App = () => {
 const Root = () => {
   return (
     <>
+      <Toast />
       <Navbar />
       <Outlet />
     </>
