@@ -3,6 +3,10 @@ import { Dispatch, SetStateAction } from 'react';
 export interface Context {
   category?: string;
   setCategory?: Dispatch<SetStateAction<string>>;
+  cart?: CartItem[];
+  setCart?: Dispatch<SetStateAction<CartItem[]>>;
+  isCartOpened?: boolean;
+  setIsCartOpened?: Dispatch<SetStateAction<boolean>>;
 }
 
 export interface ProductResponse {
@@ -44,4 +48,15 @@ export interface SelAttribute {
     id: string;
     value: string;
   };
+}
+
+export interface CartItem {
+  selAttributes: SelAttribute[];
+  attributes: Attribute[];
+  qty: number;
+  price: number;
+  imgUrl: string;
+  id: string;
+  name: string;
+  currencySymbol: string;
 }

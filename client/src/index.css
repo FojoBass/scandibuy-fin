@@ -55,3 +55,17 @@ img {
     @apply flex flex-col gap-3;
   }
 }
+
+.spinner {
+  @apply inline-block;
+  animation: spinAnim 1s infinite linear;
+}
+
+@keyframes spinAnim {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 360deg;
+  }
+}

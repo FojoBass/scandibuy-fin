@@ -1,16 +1,23 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router';
 import useFetch from '../hooks/useFetch';
-import { Attribute, Product, ProductResponse, SelAttribute } from '../types';
+import {
+  Attribute,
+  CartItem,
+  Product,
+  ProductResponse,
+  SelAttribute,
+} from '../types';
 import { GetProduct } from '../services/queries';
 import { FaAngleRight, FaHome } from 'react-icons/fa';
 import SkeletonLoader from '../components/SkeletonLoader';
 import { FaAngleLeft } from 'react-icons/fa6';
 import parse from 'html-react-parser';
+import useCart from '../hooks/useCart';
 
 const SingleProduct = () => {
   const { id } = useParams();
-  const { isLoading, response, fetchData } = useFetch<
+  const { isLoading, response, fetchReq } = useFetch<
     { product: ProductResponse },
     { id: string }
   >({ initialLoading: true });
@@ -23,9 +30,10 @@ const SingleProduct = () => {
     []
   );
   const [isDisableCartBtn, setIsDisableCartBtn] = useState(false);
+  const { addToCart } = useCart();
 
-  console.log('ATTRIBUTES: ', attributes);
-  console.log('SEL ATTRIBUTES: ', selectedAttributes);
+  // console.log('ATTRIBUTES: ', attributes);
+  // console.log('SEL ATTRIBUTES: ', selectedAttributes);
 
   const handleSelAttribute = (id: string, value: string) => {
     const targetAttr = attributes.find((attr) => attr.id === id);
@@ -52,9 +60,25 @@ const SingleProduct = () => {
     }
   };
 
+  const handleAddToCart = () => {
+    if (product) {
+      const cartItem: CartItem = {
+        id: product.id,
+        attributes,
+        imgUrl: product.gallery[0],
+        price: product.prices[0].amount,
+        currencySymbol: product.prices[0].currency.symbol,
+        qty: 1,
+        selAttributes: selectedAttributes,
+        name: product.name,
+      };
+      addToCart({ cartItem });
+    }
+  };
+
   useEffect(() => {
     if (id) {
-      fetchData(GetProduct, { id });
+      fetchReq(GetProduct, { id });
     } else navigate('/');
   }, [id]);
 
@@ -126,7 +150,7 @@ const SingleProduct = () => {
 
                 <div className='w-[90%]  h-[750px] max-h-[95vh] relative flex items-center justify-center overflow-x-hidden gallery_wrapper'>
                   <button
-                    className={`absolute z-10 top-[50%] translate-y-[-50%] left-10 bg-black text-white opacity-50 duration-200 hover:opacity-100 cursor-pointer p-1 ${
+                    className={`absolute z-[1] top-[50%] translate-y-[-50%] left-10 bg-black text-white opacity-50 duration-200 hover:opacity-100 cursor-pointer p-1 ${
                       currentIndex === 0 ? 'hidden' : ''
                     }`}
                     onClick={() =>
@@ -140,7 +164,7 @@ const SingleProduct = () => {
                   </button>
 
                   <button
-                    className={`absolute z-10 top-[50%] translate-y-[-50%] right-10 bg-black text-white opacity-50 duration-200 hover:opacity-100 cursor-pointer p-1 ${
+                    className={`absolute z-[1] top-[50%] translate-y-[-50%] right-10 bg-black text-white opacity-50 duration-200 hover:opacity-100 cursor-pointer p-1 ${
                       currentIndex >= product.gallery.length - 1 ? 'hidden' : ''
                     }`}
                     onClick={() =>
@@ -207,7 +231,7 @@ const SingleProduct = () => {
                                 backgroundClip: 'content-box',
                               }}
                               onClick={() => handleSelAttribute(id, value)}
-                              disabled={isSelected}
+                              disabled={isSelected || !product.inStock}
                             />
                           ) : (
                             <button
@@ -216,7 +240,7 @@ const SingleProduct = () => {
                                 isSelected ? 'bg-black text-white' : ''
                               }`}
                               onClick={() => handleSelAttribute(id, value)}
-                              disabled={isSelected}
+                              disabled={isSelected || !product.inStock}
                             >
                               {value}
                             </button>
@@ -230,7 +254,7 @@ const SingleProduct = () => {
                     <b className='uppercase text-sm block w-fit'>Price:</b>
                     <b className='text-lg'>
                       {product.prices[0].currency.symbol}
-                      {product.prices[0].amount}
+                      {product.prices[0].amount.toLocaleString()}
                     </b>
                   </div>
                 </div>
@@ -243,6 +267,7 @@ const SingleProduct = () => {
                         : 'cursor-pointer hover:bg-green-500'
                     }`}
                     disabled={isDisableCartBtn}
+                    onClick={handleAddToCart}
                   >
                     ADD TO CART
                   </button>

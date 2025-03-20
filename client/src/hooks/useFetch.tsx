@@ -9,23 +9,27 @@ const useFetch = <R, T = undefined>({ initialLoading }: FetchProps) => {
   const [isLoading, setIsLoading] = useState(initialLoading);
   const [response, setResponse] = useState<R | null>(null);
 
-  const fetchData = async (
+  const fetchReq = async (
     query: string,
     variables?: T,
-    signal?: AbortSignal | null
+    signal?: AbortSignal | null,
+    onSuccess?: () => void,
+    onError?: () => void
   ) => {
     try {
       setIsLoading(true);
       const res = await fetchFunc<R, T>(query, variables, signal);
       setResponse(res);
+      if (onSuccess) onSuccess();
     } catch (err) {
-      console.error('Error in fetchData:', err);
+      if (onError) onError();
+      console.error('Error in fetchReq:', err);
     } finally {
       if (!signal?.aborted) setIsLoading(false);
     }
   };
 
-  return { isLoading, response, fetchData };
+  return { isLoading, response, fetchReq };
 };
 
 export default useFetch;

@@ -10,14 +10,7 @@ import SingleProduct from './pages/SingleProduct';
 import NotFound from './pages/NotFound';
 import Navbar from './components/Navbar';
 
-/*
-This is how the attributes for orders looks like
 
-[{"id": "Size", "selItem": {"id": "40", "value": "40", "__typename": "Attribute", "displayValue": "40"}}]
-
-
-
-*/
 
 const App = () => {
   const router = createBrowserRouter(

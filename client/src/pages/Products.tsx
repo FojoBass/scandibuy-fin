@@ -1,22 +1,24 @@
 import { MouseEventHandler, useEffect, useState } from 'react';
 import useGlobalContext from '../hooks/useGlobalContext';
 import useFetch from '../hooks/useFetch';
-import { Product, ProductResponse } from '../types';
+import { CartItem, Product, ProductResponse } from '../types';
 import { AllProducts, CategoryProducts } from '../services/queries';
 import SkeletonLoader from '../components/SkeletonLoader';
 import { Link } from 'react-router';
 import { AiOutlineShoppingCart } from 'react-icons/ai';
 import { kebabFormatter } from '../helpers';
+import useCart from '../hooks/useCart';
 
 const Products = () => {
   const { category } = useGlobalContext();
-  const { fetchData, isLoading, response } = useFetch<
+  const { fetchReq, isLoading, response } = useFetch<
     { products?: ProductResponse[]; categProduct?: ProductResponse[] },
     { categ: string } | undefined
   >({
     initialLoading: true,
   });
   const [products, setProducts] = useState<Product[]>([]);
+  const { addToCart } = useCart();
 
   console.log({ products, response });
 
@@ -29,12 +31,32 @@ const Products = () => {
     }
   };
 
+  const handleAdd = (id: string) => {
+    const product = products.find(({ id: prodId }) => prodId === id);
+    if (product) {
+      const cartItem: CartItem = {
+        id: product.id,
+        attributes: product.attributes,
+        imgUrl: product.gallery[0],
+        price: product.prices[0].amount,
+        currencySymbol: product.prices[0].currency.symbol,
+        qty: 1,
+        selAttributes: product.attributes.map(({ id, items }) => ({
+          id,
+          selItem: items[0],
+        })),
+        name: product.name,
+      };
+      addToCart({ cartItem });
+    }
+  };
+
   useEffect(() => {
     const controller = new AbortController();
 
     if (category)
-      fetchData(CategoryProducts, { categ: category }, controller.signal);
-    else fetchData(AllProducts, undefined, controller.signal);
+      fetchReq(CategoryProducts, { categ: category }, controller.signal);
+    else fetchReq(AllProducts, undefined, controller.signal);
 
     return () => {
       controller.abort(new Error('Aborted due to change in category'));
@@ -87,8 +109,9 @@ const Products = () => {
                       <img src={gallery[0]} alt={name} />
                       {Boolean(inStock) && (
                         <button
-                          className='p-2 bg-green-500 text-white rounded-full absolute bottom-0 right-5 translate-y-[50%] cursor-pointer group-hover:opacity-100 group-hover:z-10 opacity-0 z-0 duration-300'
+                          className='p-2 bg-green-500 text-white rounded-full absolute bottom-0 right-5 translate-y-[50%] cursor-pointer group-hover:opacity-100 group-hover:z-[1] opacity-0 z-0 duration-300'
                           data-id='prod-cart-btn'
+                          onClick={() => handleAdd(id)}
                         >
                           <AiOutlineShoppingCart
                             className='pointer-events-none'
@@ -100,7 +123,7 @@ const Products = () => {
                     <p>{name}</p>
                     <b>
                       {prices[0].currency.symbol}
-                      {prices[0].amount}
+                      {prices[0].amount.toLocaleString()}
                     </b>
                     {Boolean(inStock) || (
                       <h3 className='text-2xl font-semibold absolute translate-[-50%] top-[50%] left-[50%]'>
