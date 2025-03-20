@@ -14,6 +14,7 @@ import SkeletonLoader from '../components/SkeletonLoader';
 import { FaAngleLeft } from 'react-icons/fa6';
 import parse from 'html-react-parser';
 import useCart from '../hooks/useCart';
+import { kebabFormatter } from '../helpers';
 
 const SingleProduct = () => {
   const { id } = useParams();
@@ -128,7 +129,10 @@ const SingleProduct = () => {
           ) : product ? (
             <>
               <div className='w-[70%] flex gap-5 items-start sticky top-5'>
-                <aside className='w-[10%] flex flex-col gap-4'>
+                <aside
+                  className='w-[10%] flex flex-col gap-4'
+                  data-testid='product-gallery'
+                >
                   {product.gallery.map((url, index) => (
                     <button
                       key={url}
@@ -208,8 +212,12 @@ const SingleProduct = () => {
                 </h1>
 
                 <div>
-                  {attributes.map(({ id, items }) => (
-                    <div key={id} className='mb-5'>
+                  {attributes.map(({ id, items, name }) => (
+                    <div
+                      key={id}
+                      className='mb-5'
+                      data-testid={`product-attribute-${kebabFormatter(name)}`}
+                    >
                       <b className='uppercase text-sm'>{id}:</b>
                       <div className='flex gap-2'>
                         {items.map(({ displayValue, value }) => {
@@ -268,12 +276,16 @@ const SingleProduct = () => {
                     }`}
                     disabled={isDisableCartBtn}
                     onClick={handleAddToCart}
+                    data-testid='add-to-cart'
                   >
                     ADD TO CART
                   </button>
                 )}
 
-                <div className='mt-6 text-sm desc_wrapper'>
+                <div
+                  className='mt-6 text-sm desc_wrapper'
+                  data-testid='product-description'
+                >
                   {parse(product.description)}
                 </div>
               </aside>

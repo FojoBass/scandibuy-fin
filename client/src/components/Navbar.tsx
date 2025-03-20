@@ -8,6 +8,7 @@ import SkeletonLoader from './SkeletonLoader';
 import useFetch from '../hooks/useFetch';
 import { FaMinus, FaPlus, FaSpinner } from 'react-icons/fa6';
 import useCart from '../hooks/useCart';
+import { kebabFormatter } from '../helpers';
 
 interface Order {
   product_id: string;
@@ -121,6 +122,7 @@ const Navbar = () => {
           <button
             className='relative cursor-pointer'
             onClick={() => setIsCartOpened?.(true)}
+            data-testid='cart-btn'
           >
             <AiOutlineShoppingCart size={25} />
             <span className='absolute top-0 right-0 translate-x-[25%] translate-y-[-30%] flex items-center justify-center bg-black text-white rounded-full text-xs px-1'>
@@ -139,8 +141,8 @@ const Navbar = () => {
         >
           <div className='absolute w-[500px]  bg-white top-[60px] right-[20px] p-5'>
             <header>
-              <b>My Bag</b>, {cart?.length ?? 0} item
-              {cart?.length === 1 ? '' : 's'}
+              <b>My Bag</b>, {cartTotalItems} item
+              {cartTotalItems === 1 ? '' : 's'}
             </header>
 
             <div className='my-5 max-h-[400px] overflow-y-auto'>
@@ -174,7 +176,13 @@ const Navbar = () => {
                         <div>
                           {attributes.map(
                             ({ id: attrId, items, name: attrName }) => (
-                              <div key={attrId} className='my-1'>
+                              <div
+                                key={attrId}
+                                className='my-1'
+                                data-testid={`cart-item-attribute-${kebabFormatter(
+                                  attrName
+                                )}`}
+                              >
                                 <p>{attrName}:</p>
                                 <div className='flex gap-1'>
                                   {items.map(({ displayValue, value }) => {
@@ -196,6 +204,11 @@ const Navbar = () => {
                                           backgroundColor: value,
                                           backgroundClip: 'content-box',
                                         }}
+                                        data-testid={`cart-item-attribute-${kebabFormatter(
+                                          attrName
+                                        )}-${kebabFormatter(value)}${
+                                          isSelected ? '-selected' : ''
+                                        }`}
                                       ></span>
                                     ) : (
                                       <span
@@ -204,6 +217,11 @@ const Navbar = () => {
                                           isSelected
                                             ? 'bg-black text-white'
                                             : ''
+                                        }`}
+                                        data-testid={`cart-item-attribute-${kebabFormatter(
+                                          attrName
+                                        )}-${kebabFormatter(value)}${
+                                          isSelected ? '-selected' : ''
                                         }`}
                                       >
                                         {value}
@@ -221,15 +239,17 @@ const Navbar = () => {
                         <button
                           className='cursor-pointer border border-black p-1 text-xs active:scale-95'
                           onClick={() => adjustQty('increment', id)}
+                          data-testid='cart-item-amount-increase'
                         >
                           <FaPlus />
                         </button>
 
-                        <span>{qty}</span>
+                        <span data-testid='cart-item-amount'>{qty}</span>
 
                         <button
                           className='cursor-pointer border border-black p-1 text-xs active:scale-95'
                           onClick={() => adjustQty('decrement', id, qty)}
+                          data-testid='cart-item-amount-decrease'
                         >
                           <FaMinus />
                         </button>
@@ -250,7 +270,13 @@ const Navbar = () => {
 
             <footer className='mt-15'>
               <div className='flex justify-between items-center font-semibold'>
-                Total <span>${cartTotalAmount.toLocaleString()}</span>
+                Total{' '}
+                <span>
+                  $
+                  <span data-testid='cart-total'>
+                    {cartTotalAmount.toLocaleString()}
+                  </span>
+                </span>
               </div>
 
               <button
