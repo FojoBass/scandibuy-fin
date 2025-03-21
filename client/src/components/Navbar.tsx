@@ -147,120 +147,123 @@ const Navbar = () => {
 
             <div className='my-5 max-h-[400px] overflow-y-auto'>
               {cart?.length ? (
-                cart.map(
-                  (
-                    {
-                      attributes,
-                      id,
-                      imgUrl,
-                      price,
-                      qty,
-                      selAttributes,
-                      name,
-                      currencySymbol,
-                    },
-                    ind
-                  ) => (
-                    <div
-                      key={ind}
-                      className='flex mb-7 gap-2 items-stretch  overflow-hidden max-h-[500px] h-fit'
-                    >
-                      <div className='w-[60%] flex flex-col text-sm justify-between'>
-                        <h3 className='text-md text-md'>{name}</h3>
+                [...cart]
+                  .reverse()
+                  .map(
+                    (
+                      {
+                        attributes,
+                        id,
+                        imgUrl,
+                        price,
+                        qty,
+                        selAttributes,
+                        name,
+                        currencySymbol,
+                      },
+                      ind
+                    ) => (
+                      <div
+                        key={ind}
+                        className='flex mb-7 gap-2 items-stretch  overflow-hidden max-h-[500px] h-fit'
+                      >
+                        <div className='w-[60%] flex flex-col text-sm justify-between'>
+                          <h3 className='text-md text-md'>{name}</h3>
 
-                        <p className='font-semibold'>
-                          {currencySymbol}
-                          {price.toLocaleString()}
-                        </p>
+                          <p className='font-semibold'>
+                            {currencySymbol}
+                            {price.toLocaleString()}
+                          </p>
 
-                        <div>
-                          {attributes.map(
-                            ({ id: attrId, items, name: attrName }) => (
-                              <div
-                                key={attrId}
-                                className='my-1'
-                                data-testid={`cart-item-attribute-${kebabFormatter(
-                                  attrName
-                                )}`}
-                              >
-                                <p>{attrName}:</p>
-                                <div className='flex gap-1'>
-                                  {items.map(({ displayValue, value }) => {
-                                    const isSelected = selAttributes.some(
-                                      ({ id: selId, selItem }) =>
-                                        selId === attrId &&
-                                        selItem.value === value
-                                    );
+                          <div>
+                            {attributes.map(
+                              ({ id: attrId, items, name: attrName }) => (
+                                <div
+                                  key={attrId}
+                                  className='my-1'
+                                  data-testid={`cart-item-attribute-${kebabFormatter(
+                                    attrName
+                                  )}`}
+                                >
+                                  <p>{attrName}:</p>
+                                  <div className='flex gap-1'>
+                                    {items.map(({ displayValue, value }) => {
+                                      const isSelected = selAttributes.some(
+                                        ({ id: selId, selItem }) =>
+                                          selId === attrId &&
+                                          selItem.value === value
+                                      );
 
-                                    return attrId.toLowerCase() === 'color' ? (
-                                      <span
-                                        key={displayValue}
-                                        className={`w-7 border-2 p-[2px] duration-200  aspect-square   ${
-                                          isSelected
-                                            ? 'border-green-500'
-                                            : 'border-transparent'
-                                        } `}
-                                        style={{
-                                          backgroundColor: value,
-                                          backgroundClip: 'content-box',
-                                        }}
-                                        data-testid={`cart-item-attribute-${kebabFormatter(
-                                          attrName
-                                        )}-${kebabFormatter(value)}${
-                                          isSelected ? '-selected' : ''
-                                        }`}
-                                      ></span>
-                                    ) : (
-                                      <span
-                                        key={displayValue}
-                                        className={`border border-black py-1  text-center w-[50px] text-xs  ${
-                                          isSelected
-                                            ? 'bg-black text-white'
-                                            : ''
-                                        }`}
-                                        data-testid={`cart-item-attribute-${kebabFormatter(
-                                          attrName
-                                        )}-${kebabFormatter(value)}${
-                                          isSelected ? '-selected' : ''
-                                        }`}
-                                      >
-                                        {value}
-                                      </span>
-                                    );
-                                  })}
+                                      return attrId.toLowerCase() ===
+                                        'color' ? (
+                                        <span
+                                          key={displayValue}
+                                          className={`w-7 border-2 p-[2px] duration-200  aspect-square   ${
+                                            isSelected
+                                              ? 'border-green-500'
+                                              : 'border-transparent'
+                                          } `}
+                                          style={{
+                                            backgroundColor: value,
+                                            backgroundClip: 'content-box',
+                                          }}
+                                          data-testid={`cart-item-attribute-${kebabFormatter(
+                                            attrName
+                                          )}-${kebabFormatter(value)}${
+                                            isSelected ? '-selected' : ''
+                                          }`}
+                                        ></span>
+                                      ) : (
+                                        <span
+                                          key={displayValue}
+                                          className={`border border-black py-1  text-center w-[50px] text-xs  ${
+                                            isSelected
+                                              ? 'bg-black text-white'
+                                              : ''
+                                          }`}
+                                          data-testid={`cart-item-attribute-${kebabFormatter(
+                                            attrName
+                                          )}-${kebabFormatter(value)}${
+                                            isSelected ? '-selected' : ''
+                                          }`}
+                                        >
+                                          {value}
+                                        </span>
+                                      );
+                                    })}
+                                  </div>
                                 </div>
-                              </div>
-                            )
-                          )}
+                              )
+                            )}
+                          </div>
+                        </div>
+
+                        <div className='w-[10%] flex flex-col justify-between items-center'>
+                          <button
+                            className='cursor-pointer border border-black p-1 text-xs active:scale-95'
+                            onClick={() => adjustQty('increment', id)}
+                            data-testid='cart-item-amount-increase'
+                          >
+                            <FaPlus />
+                          </button>
+
+                          <span data-testid='cart-item-amount'>{qty}</span>
+
+                          <button
+                            className='cursor-pointer border border-black p-1 text-xs active:scale-95'
+                            onClick={() => adjustQty('decrement', id, qty)}
+                            data-testid='cart-item-amount-decrease'
+                          >
+                            <FaMinus />
+                          </button>
+                        </div>
+
+                        <div className='w-[30%]'>
+                          <img src={imgUrl} alt={name} />
                         </div>
                       </div>
-
-                      <div className='w-[10%] flex flex-col justify-between items-center'>
-                        <button
-                          className='cursor-pointer border border-black p-1 text-xs active:scale-95'
-                          onClick={() => adjustQty('increment', id)}
-                          data-testid='cart-item-amount-increase'
-                        >
-                          <FaPlus />
-                        </button>
-
-                        <span data-testid='cart-item-amount'>{qty}</span>
-
-                        <button
-                          className='cursor-pointer border border-black p-1 text-xs active:scale-95'
-                          onClick={() => adjustQty('decrement', id, qty)}
-                          data-testid='cart-item-amount-decrease'
-                        >
-                          <FaMinus />
-                        </button>
-                      </div>
-
-                      <div className='w-[30%]'>
-                        <img src={imgUrl} alt={name} />
-                      </div>
-                    </div>
+                    )
                   )
-                )
               ) : (
                 <p className='text-center font-semibold italic text-slate-500'>
                   Cart Empty
