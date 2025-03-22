@@ -114,7 +114,7 @@ const Navbar = () => {
                       ? 'active-category-link'
                       : 'category-link'
                   }
-                  href={option}
+                  href={`/${option}`}
                 >
                   {option}
                 </a>
