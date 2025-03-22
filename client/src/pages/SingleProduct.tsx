@@ -240,6 +240,9 @@ const SingleProduct = () => {
                               }}
                               onClick={() => handleSelAttribute(id, value)}
                               disabled={isSelected || !product.inStock}
+                              data-testid={`product-attribute-${kebabFormatter(
+                                name
+                              )}-${kebabFormatter(value)}`}
                             />
                           ) : (
                             <button
@@ -249,6 +252,9 @@ const SingleProduct = () => {
                               }`}
                               onClick={() => handleSelAttribute(id, value)}
                               disabled={isSelected || !product.inStock}
+                              data-testid={`product-attribute-${kebabFormatter(
+                                name
+                              )}-${kebabFormatter(value)}`}
                             >
                               {value}
                             </button>
