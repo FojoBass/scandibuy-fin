@@ -54,7 +54,7 @@ const Products = () => {
   useEffect(() => {
     const controller = new AbortController();
 
-    if (category)
+    if (category && category !== 'all')
       fetchReq(CategoryProducts, { categ: category }, controller.signal);
     else fetchReq(AllProducts, undefined, controller.signal);
 

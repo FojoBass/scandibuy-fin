@@ -2,7 +2,7 @@ import { AiOutlineShoppingCart } from 'react-icons/ai';
 import { RiShoppingBag2Fill } from 'react-icons/ri';
 import { useLocation, useNavigate, useSearchParams } from 'react-router';
 import useGlobalContext from '../hooks/useGlobalContext';
-import { useEffect, useMemo, useState } from 'react';
+import { MouseEvent, useEffect, useMemo, useState } from 'react';
 import { AllCategories, CreateOrder } from '../services/queries';
 import SkeletonLoader from './SkeletonLoader';
 import useFetch from '../hooks/useFetch';
@@ -38,7 +38,11 @@ const Navbar = () => {
     initialLoading: false,
   });
 
-  const handleCategoryClick = (categ: string) => {
+  const handleCategoryClick = (
+    categ: string,
+    e: MouseEvent<HTMLAnchorElement>
+  ) => {
+    e.preventDefault();
     if (pathname !== '/') navigate(`/?c${categ}`);
     setSearchParams({ c: categ });
   };
@@ -80,8 +84,8 @@ const Navbar = () => {
 
   useEffect(() => {
     if (response) {
-      setOptions(response.categories);
-      setSearchParams({ c: response.categories[0] });
+      setOptions(['all', ...response.categories]);
+      setSearchParams({ c: 'all' });
     }
   }, [response]);
 
@@ -101,18 +105,19 @@ const Navbar = () => {
               <SkeletonLoader width='200px' height='30px' />
             ) : (
               options.map((option) => (
-                <button
+                <a
                   key={option}
                   className={`nav_btn ${categValue === option ? 'active' : ''}`}
-                  onClick={() => handleCategoryClick(option)}
+                  onClick={(e) => handleCategoryClick(option, e)}
                   data-testid={
                     categValue === option
                       ? 'active-category-link'
                       : 'category-link'
                   }
+                  href={option}
                 >
                   {option}
-                </button>
+                </a>
               ))
             )}
           </div>
@@ -138,6 +143,7 @@ const Navbar = () => {
           onClick={(e) =>
             e.currentTarget === e.target && setIsCartOpened?.(false)
           }
+          data-testid='cart-overlay'
         >
           <div className='absolute w-[500px]  bg-white top-[60px] right-[20px] p-5'>
             <header>
