@@ -126,7 +126,7 @@ const Navbar = () => {
 
           <button
             className='relative cursor-pointer'
-            onClick={() => setIsCartOpened?.(true)}
+            onClick={() => setIsCartOpened?.(!isCartOpened)}
             data-testid='cart-btn'
           >
             <AiOutlineShoppingCart size={25} />
