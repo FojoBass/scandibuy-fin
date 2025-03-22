@@ -1,2 +1,4 @@
-export const kebabFormatter = (text: string): string =>
-  text.toLowerCase().split(' ').join('-');
+export const kebabFormatter = (text: string, isNoLowerCase?: boolean): string =>
+  isNoLowerCase
+    ? text.split(' ').join('-')
+    : text.toLowerCase().split(' ').join('-');

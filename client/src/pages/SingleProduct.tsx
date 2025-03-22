@@ -242,7 +242,7 @@ const SingleProduct = () => {
                               disabled={isSelected || !product.inStock}
                               data-testid={`product-attribute-${kebabFormatter(
                                 name
-                              )}-${kebabFormatter(value)}`}
+                              )}-${kebabFormatter(value, true)}`}
                             />
                           ) : (
                             <button
@@ -254,7 +254,7 @@ const SingleProduct = () => {
                               disabled={isSelected || !product.inStock}
                               data-testid={`product-attribute-${kebabFormatter(
                                 name
-                              )}-${kebabFormatter(value)}`}
+                              )}-${kebabFormatter(value, true)}`}
                             >
                               {value}
                             </button>

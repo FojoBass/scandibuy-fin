@@ -215,7 +215,7 @@ const Navbar = () => {
                                           }}
                                           data-testid={`cart-item-attribute-${kebabFormatter(
                                             attrName
-                                          )}-${kebabFormatter(value)}${
+                                          )}-${kebabFormatter(value, true)}${
                                             isSelected ? '-selected' : ''
                                           }`}
                                         ></span>
@@ -229,7 +229,7 @@ const Navbar = () => {
                                           }`}
                                           data-testid={`cart-item-attribute-${kebabFormatter(
                                             attrName
-                                          )}-${kebabFormatter(value)}${
+                                          )}-${kebabFormatter(value, true)}${
                                             isSelected ? '-selected' : ''
                                           }`}
                                         >
