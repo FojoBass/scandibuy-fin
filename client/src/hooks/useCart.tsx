@@ -63,7 +63,7 @@ const useCart = () => {
             cartItem.id === itemId
               ? {
                   ...cartItem,
-                  qty: cartItem.qty++,
+                  qty: cartItem.qty + 1,
                 }
               : cartItem
           )
@@ -78,7 +78,7 @@ const useCart = () => {
               cartItem.id === itemId
                 ? {
                     ...cartItem,
-                    qty: cartItem.qty--,
+                    qty: cartItem.qty - 1,
                   }
                 : cartItem
             )
