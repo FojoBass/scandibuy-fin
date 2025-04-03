@@ -83,7 +83,7 @@ const SingleProduct = () => {
     } else navigate('/');
   }, [id]);
 
-  console.log({ product });
+  // console.log({ product });
 
   useEffect(() => {
     if (response) {

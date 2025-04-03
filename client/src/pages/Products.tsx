@@ -20,14 +20,14 @@ const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const { addToCart } = useCart();
 
-  console.log({ products, response });
+  // console.log({ products, response });
 
   const handleLinkClick: MouseEventHandler<HTMLAnchorElement> = (e) => {
     const el = e.target as HTMLElement;
 
     if (el.dataset.id === 'prod-cart-btn') {
       e.preventDefault();
-      console.log('ADD DEFAULTS TO CART');
+      // console.log('ADD DEFAULTS TO CART');
     }
   };
 

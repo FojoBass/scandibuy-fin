@@ -12,7 +12,7 @@ export const AppProvider = ({ children }: { children: React.ReactNode }) => {
     state: boolean;
   }>({ type: 'neutral', message: '', state: false });
 
-  console.log({ cart });
+  // console.log({ cart });
 
   const sharedProps: Context = {
     category,
